@@ -113,28 +113,28 @@ fig_map = px.scatter_mapbox(coordenadas_velocidad,
 # Developing the prediction
 ###################################################
 
-Xtest = pd.read_csv("data/X_test.csv")
-filename = 'data/rf_model.pkl'
-rf_v2 = joblib.load(open(filename, 'rb'))
-Xtest_copy=Xtest.copy()
-Xtest_copy=Xtest_copy.drop('Unnamed: 0',axis=1)
-Xtest_copy = Xtest_copy.astype(np.float32)
-y_pred = rf_v2.predict(Xtest_copy)
-probs = rf_v2.predict_proba(Xtest_copy)
-alarms=Xtest.loc[y_pred==1]
+#Xtest = pd.read_csv("data/X_test.csv")
+#filename = 'data/rf_model.pkl'
+#rf_v2 = joblib.load(open(filename, 'rb'))
+#Xtest_copy=Xtest.copy()
+#Xtest_copy=Xtest_copy.drop('Unnamed: 0',axis=1)
+#Xtest_copy = Xtest_copy.astype(np.float32)
+#y_pred = rf_v2.predict(Xtest_copy)
+#probs = rf_v2.predict_proba(Xtest_copy)
+#alarms=Xtest.loc[y_pred==1]
 
 #indices = alarms.iloc[:,0]
 #tabla_alarmas=alarmas_presentacion.loc[indices,:]
 
-fig_map_predictive = px.scatter_mapbox(alarms,
-                        lat="latitude",
-                        lon="longitude",
-                        hover_name='month', hover_data=["month","weekMonth", "weekDay","grouped_hours"],
-                        color="month",
-                        size="month",
-                        color_continuous_scale=px.colors.cyclical.Edge,
-                        size_max=12,
-                        zoom=4.5)
+#fig_map_predictive = px.scatter_mapbox(alarms,
+#                        lat="latitude",
+#                       lon="longitude",
+#                        hover_name='month', hover_data=["month","weekMonth", "weekDay","grouped_hours"],
+#                        color="month",
+#                        size="month",
+#                        color_continuous_scale=px.colors.cyclical.Edge,
+#                        size_max=12,
+#                        zoom=4.5)
 
 
 # The style arguments for the sidebar. We use position:fixed and a fixed width
