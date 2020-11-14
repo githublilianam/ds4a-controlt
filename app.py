@@ -32,6 +32,7 @@ app.config['suppress_callback_exceptions'] = True
 #eventos_gps = pd.read_csv("data/eventos_gps.csv")
 #conductores = pd.read_csv("data/conductores.csv")
 excesos_velocidad0 = pd.read_csv("data/AlarmasExcesosVel.csv")
+alarms_selected = pd.read_csv("data/selected_alarms.csv")
 
 #vehiculos = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/vehiculos.csv")
 #companias = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/compañias.csv")
@@ -128,15 +129,15 @@ fig_map = px.scatter_mapbox(coordenadas_velocidad,
 #indices = alarms.iloc[:,0]
 #tabla_alarmas=alarmas_presentacion.loc[indices,:]
 
-#fig_map_predictive = px.scatter_mapbox(alarms,
-#                        lat="latitude",
-#                       lon="longitude",
-#                        hover_name='month', hover_data=["month","weekMonth", "weekDay","grouped_hours"],
-#                        color="month",
-#                        size="month",
-#                        color_continuous_scale=px.colors.cyclical.Edge,
-#                        size_max=12,
-#                        zoom=4.5)
+fig_map_predictive = px.scatter_mapbox(alarms_selected,
+                        lat="latitude",
+                        lon="longitude",
+                        hover_name='month', hover_data=["month","EventName","idCompany", "businessName","transporter_name"],
+                        color="weekDay",
+                        size="weekDay",
+                        color_continuous_scale=px.colors.cyclical.Edge,
+                        size_max=12,
+                        zoom=4.5)
 
 
 # The style arguments for the sidebar. We use position:fixed and a fixed width
@@ -344,7 +345,7 @@ graph_map_predictive = html.Div(
 graph_map_predictive = html.Div(
     [
         html.Div("Map Alarms", className="card-header"),
-        html.Div(dcc.Graph(id="map-predictive", figure=fig_map), 
+        html.Div(dcc.Graph(id="map-predictive", figure=fig_map_predictive), 
                  className="card-body"
         ),
     ],
@@ -411,13 +412,22 @@ predictive_content = html.Div(
         html.Hr(className="my-6"),
         dbc.Row(
             [
+                html.Div(
+                    html.P("The following map represents the result of the different speeding alarms predicted. The colors represent day of the week that the alarm could be reported based on the travel, drivers, transporters, vehicles among other information given by the company."), 
+                    className="col-md-12"
+                )
+            ],
+            style=overview_main_content
+        ),
+        html.Hr(className="my-2"),
+        dbc.Row(
+            [
                 html.Div(graph_map_predictive, className="col-md-12")
             ],
             style=overview_main_content
         )
     ],
     className="container-fluid"
-
 )
 
 # Our team content
@@ -463,10 +473,14 @@ team_content = html.Div(
                                     [
                                         html.Div( 
                                             [
-                                                html.Div(className="bd-placeholder-img card-img-top image-member"),
+                                                html.Div(className="bd-placeholder-img card-img-top image-member2"),
                                                 html.Div( 
                                                     [
-                                                        html.Div("Comming soon", className="card-text"),
+                                                        html.Div(
+                                                            [
+                                                                html.H5("John Ortiz"),
+                                                                html.P("Ingeniero Quimico - Universidad de los Andes | MSc. Ingenieria quimica - Universidad de los Andes | MSc. Informática - Universidad de Northeastern")
+                                                            ], className="card-text"),
                                                     ],className='card-body'
                                                 )
                                             ],className="card mb-4 shadow-sm"
