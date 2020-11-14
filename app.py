@@ -26,39 +26,40 @@ app.config['suppress_callback_exceptions'] = True
 # Importing data
 ###################################################
 
-zf = zipfile.ZipFile('data/BitacoraDepurada.zip') 
-bitacora = pd.read_csv(zf.open('BitacoraDepurada.csv'))
-viajes = pd.read_csv("data/ViajesDepurados.csv")
-eventos_gps = pd.read_csv("data/eventos_gps.csv")
-conductores = pd.read_csv("data/conductores.csv")
+#zf = zipfile.ZipFile('data/BitacoraDepurada.zip') 
+#bitacora = pd.read_csv(zf.open('BitacoraDepurada.csv'))
+#viajes = pd.read_csv("data/ViajesDepurados.csv")
+#eventos_gps = pd.read_csv("data/eventos_gps.csv")
+#conductores = pd.read_csv("data/conductores.csv")
+excesos_velocidad0 = pd.read_csv("data/AlarmasExcesosVel.csv")
 
 #vehiculos = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/vehiculos.csv")
 #companias = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/compañias.csv")
 #transportistas = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/transportadores.csv")
 
-bitacora.drop("Unnamed: 0", axis=1, inplace=True)
-viajes.drop("Unnamed: 0", axis=1, inplace=True)
+#bitacora.drop("Unnamed: 0", axis=1, inplace=True)
+#viajes.drop("Unnamed: 0", axis=1, inplace=True)
 
 
 ###################################################
 # Combining eventos GPS data base to get the event names
 ###################################################
 
-bitacora = bitacora.merge(eventos_gps, left_on="idEventGPS", right_on="IdEventsGPS")
-bitacora = bitacora.drop(["idEventGPS", "IdEventsGPS"], axis=1)
-bitacora = bitacora.rename({"name": "EventName"}, axis = 1)
+#bitacora = bitacora.merge(eventos_gps, left_on="idEventGPS", right_on="IdEventsGPS")
+#bitacora = bitacora.drop(["idEventGPS", "IdEventsGPS"], axis=1)
+#bitacora = bitacora.rename({"name": "EventName"}, axis = 1)
 
 
-eventos_anormales = ['Fuera de ruta', 'Vehículo detenido', 'Vehículo inició marcha', 
-                    'Entrada zona alto riesgo', 'Dentro zona alto riesgo', 'No llegada a tiempo',
-                    'Botón de Paníco', 'Aproximación al destino por distancia',
-                    'Condiccion continua', 'Excesos de velocidad']
+#eventos_anormales = ['Fuera de ruta', 'Vehículo detenido', 'Vehículo inició marcha', 
+#                    'Entrada zona alto riesgo', 'Dentro zona alto riesgo', 'No llegada a tiempo',
+#                    'Botón de Paníco', 'Aproximación al destino por distancia',
+#                    'Condiccion continua', 'Excesos de velocidad']
 
-alarmas_anomalas = bitacora.loc[bitacora["EventName"].isin(eventos_anormales)]
+#alarmas_anomalas = bitacora.loc[bitacora["EventName"].isin(eventos_anormales)]
 
-alarmas_anomalas = alarmas_anomalas.merge(viajes, left_on="idWorkOrder", right_on="idWorkOrder")
+#alarmas_anomalas = alarmas_anomalas.merge(viajes, left_on="idWorkOrder", right_on="idWorkOrder")
 
-alarmas_anomalas.drop(["tipo","Country", "endLatitude", "endLongitude","inTransitTimeOn", "inTransitTimeOff", "idTrailer"], axis=1, inplace=True)
+#alarmas_anomalas.drop(["tipo","Country", "endLatitude", "endLongitude","inTransitTimeOn", "inTransitTimeOff", "idTrailer"], axis=1, inplace=True)
 
 #Eliminando columnas no utilizadas en el modelo
 #alarmas_presentacion = alarmas_anomalas.drop(["idMonitoringOrdersAlarm", "createdOn_y", 
@@ -85,9 +86,10 @@ alarmas_anomalas.drop(["tipo","Country", "endLatitude", "endLongitude","inTransi
 #                             "businessName_x":"CompanyName",
 #                             "businessName_y":"TransporterName"}, axis=1, inplace=True)
                                              
-eventos_grupos = alarmas_anomalas.groupby("EventName")["longitude"].count().sort_values(ascending=False)
+#eventos_grupos = alarmas_anomalas.groupby("EventName")["longitude"].count().sort_values(ascending=False)
 
-excesos_velocidad = alarmas_anomalas[alarmas_anomalas["EventName"] == 'Excesos de velocidad']
+excesos_velocidad = excesos_velocidad0
+#excesos_velocidad = alarmas_anomalas[alarmas_anomalas["EventName"] == 'Excesos de velocidad']
 excesos_velocidad["month"].unique()
 
 coordenadas_velocidad = excesos_velocidad.groupby(["longitude","latitude"])["idCompany"].count().sort_values(ascending=False)
