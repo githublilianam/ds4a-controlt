@@ -1,0 +1,49 @@
+"IdEventsGPS","name"
+1,Fuera de ruta
+2,Dentro de ruta
+3,Botón de Paníco
+4,Entrada zona alto riesgo
+5,Dentro zona alto riesgo
+6,Salida zona alto riesgo
+7,Entrada localidad cliente
+8,Dentro localidad cliente
+9,Salida localidad cliente
+10,Reconexión alimentación externa
+11,Desconexión alimentación externa
+12,Excesos de velocidad
+13,Inicio de ruta
+14,Fin de ruta
+15,Inicio de viaje
+16,Fin de viaje
+17,Vehiculo apagado
+18,Vehiculo encendido
+19,Puntos de referencia autorizados
+20,Entrada zona prohibida
+21,Dentro de zona prohibida
+22,Salida de zona prohibida
+23,Paso por zona peaje
+24,Paso zona puesto de control virtual
+25,Paso zona puesto de control físico
+26,Movimiento horario no permitido
+27,Sin señal GPS
+37,Entrada destinatario
+38,Dentro destinatario
+39,Salida destinatario
+41,Llamada de seguimiento
+42,Alarma Manual
+44,Vehículo detenido
+45,Vehículo inició marcha
+48,En ruta sin novedad alguna
+55,Temperatura
+58,Llegada del vehiculo tarde
+59,Aproximación al destino por distancia
+60,Reporte por giro
+62,Salio zona puesto de control virtual
+66,Aproximación al destino por tiempo
+68,Temperatura fuera de los limites
+69,Condiccion continua
+70,No llegada a tiempo
+73,Prueba - incumplimiento cita de cargue
+74,prueba - incumplimiento cita carge
+75,Entrega Cliente
+77,Supera Recaudo

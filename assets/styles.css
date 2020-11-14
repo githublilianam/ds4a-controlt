@@ -1,0 +1,30 @@
+#date-picker {
+    margin-left: 1rem;
+}
+.image-member1 {
+    height: 225px;
+    background-image: url(images/perfil_aleja.jpeg);
+    background-color: #55595c;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.image-member3 {
+    height: 225px;
+    background-image: url(images/perfil_liliana.jpg);
+    background-color: #55595c;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.image-transport {
+    height: 690px;
+    background-image: url(images/Transport1.jpg);
+    background-color: #fff;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.full-width {
+    width: 100%;
+}
