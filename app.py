@@ -342,7 +342,7 @@ graph_map_predictive = html.Div(
 graph_map_predictive = html.Div(
     [
         html.Div("Map Alarms", className="card-header"),
-        html.Div(dcc.Graph(id="map-predictive", figure=fig_map_predictive), 
+        html.Div(dcc.Graph(id="map-predictive", figure=fig_map), 
                  className="card-body"
         ),
     ],
