@@ -1,29 +1,32 @@
 #date-picker {
     margin-left: 1rem;
 }
-.image-member1 {
+
+.image-member1,
+.image-member2,
+.image-member3,
+.image-transport {
     height: 225px;
-    background-image: url(images/perfil_aleja.jpeg);
-    background-color: #55595c;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: #777777;
     background-size: contain;
+}
+
+.image-member1 {
+    background-image: url(images/perfil_aleja.jpeg);
+}
+.image-member2 {
+    background-image: url(images/perfil_john.png);
 }
 .image-member3 {
-    height: 225px;
     background-image: url(images/perfil_liliana.jpg);
-    background-color: #55595c;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
 }
 .image-transport {
-    height: 690px;
+    height: 690px !important;
     background-image: url(images/Transport1.jpg);
-    background-color: #fff;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+    background-color: #fff !important;
+    background-size: cover !important;
 }
 .full-width {
     width: 100%;
