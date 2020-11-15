@@ -698,7 +698,7 @@ def update_fig_operations (start_date,end_date):
 def update_table (clickData):
     longitud = clickData['points'][0]['lon']
     latitud = clickData['points'][0]['lat']
-    alarm = alarms_selected[(predicted_alarms['latitude']==latitud) & (predicted_alarms['longitude']==longitud)]
+    alarm = predicted_alarms[(predicted_alarms['latitude']==latitud) & (predicted_alarms['longitude']==longitud)]
     return alarm.to_dict('records')
 
 
