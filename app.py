@@ -12,12 +12,16 @@ import pandas as pd
 #import seaborn as sns
 import plotly.express as px
 from datetime import datetime as dt
+import pickle
 import numpy as np
-#import joblib
 import zipfile
+#import joblib
+import dash_table
+import json
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],
                 suppress_callback_exceptions=True)
+
 
 server = app.server
 app.config['suppress_callback_exceptions'] = True
@@ -26,68 +30,11 @@ app.config['suppress_callback_exceptions'] = True
 # Importing data
 ###################################################
 
-#zf = zipfile.ZipFile('data/BitacoraDepurada.zip') 
-#bitacora = pd.read_csv(zf.open('BitacoraDepurada.csv'))
-#viajes = pd.read_csv("data/ViajesDepurados.csv")
-#eventos_gps = pd.read_csv("data/eventos_gps.csv")
-#conductores = pd.read_csv("data/conductores.csv")
 excesos_velocidad0 = pd.read_csv("data/AlarmasExcesosVel.csv")
-alarms_selected = pd.read_csv("data/selected_alarms.csv")
+predicted_alarms = pd.read_csv("data/predicted_alarms.csv")
+with open('data/feat_importance.json', 'r') as fp:
+    feat_importance = json.load(fp)
 
-#vehiculos = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/vehiculos.csv")
-#companias = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/compañias.csv")
-#transportistas = pd.read_csv("./drive/My Drive/DS4A/Project/Final databases/transportadores.csv")
-
-#bitacora.drop("Unnamed: 0", axis=1, inplace=True)
-#viajes.drop("Unnamed: 0", axis=1, inplace=True)
-
-
-###################################################
-# Combining eventos GPS data base to get the event names
-###################################################
-
-#bitacora = bitacora.merge(eventos_gps, left_on="idEventGPS", right_on="IdEventsGPS")
-#bitacora = bitacora.drop(["idEventGPS", "IdEventsGPS"], axis=1)
-#bitacora = bitacora.rename({"name": "EventName"}, axis = 1)
-
-
-#eventos_anormales = ['Fuera de ruta', 'Vehículo detenido', 'Vehículo inició marcha', 
-#                    'Entrada zona alto riesgo', 'Dentro zona alto riesgo', 'No llegada a tiempo',
-#                    'Botón de Paníco', 'Aproximación al destino por distancia',
-#                    'Condiccion continua', 'Excesos de velocidad']
-
-#alarmas_anomalas = bitacora.loc[bitacora["EventName"].isin(eventos_anormales)]
-
-#alarmas_anomalas = alarmas_anomalas.merge(viajes, left_on="idWorkOrder", right_on="idWorkOrder")
-
-#alarmas_anomalas.drop(["tipo","Country", "endLatitude", "endLongitude","inTransitTimeOn", "inTransitTimeOff", "idTrailer"], axis=1, inplace=True)
-
-#Eliminando columnas no utilizadas en el modelo
-#alarmas_presentacion = alarmas_anomalas.drop(["idMonitoringOrdersAlarm", "createdOn_y", 
-#                                     "updatedOn", "updateTravelOn", "tripNumber", "city_name",
-#                                     "status_name", "idStatus", "IdCondition", "transporter_name",
-#                                     "idCity", "city_lon", "city_lat", "codeCity_mod",
-#                                     "idCompany", "idTypeOperation", "idTypeTrip"]
-
-#Obtener nombres de los conductores
-#alarmas_presentacion = alarmas_presentacion.merge(conductores, left_on="idDriver", right_on="idDriver")
-#alarmas_presentacion["Driver"] = alarmas_presentacion["name"] + " " + alarmas_presentacion["lastName"]
-#alarmas_presentacion.drop(["name","lastName","idDriver"], axis=1, inplace=True)
-
-#Obtener licencias de los vehiculos
-#alarmas_presentacion = alarmas_presentacion.merge(vehiculos, left_on="idVehicle", right_on="idVehicle")
-#alarmas_presentacion.drop(["idVehicle"], axis=1, inplace=True)
-
-#Obtener nombres de los transportistas
-#alarmas_presentacion = alarmas_presentacion.merge(transportistas, left_on="transporter", right_on="idCompany")
-#alarmas_presentacion.drop(["transporter","idCompany","idCompanyParent"], axis=1, inplace=True)
-
-#Renombrando variables
-#alarmas_presentacion.rename({"createdOn_x":"createdOn", 
-#                             "businessName_x":"CompanyName",
-#                             "businessName_y":"TransporterName"}, axis=1, inplace=True)
-                                             
-#eventos_grupos = alarmas_anomalas.groupby("EventName")["longitude"].count().sort_values(ascending=False)
 
 excesos_velocidad = excesos_velocidad0
 #excesos_velocidad = alarmas_anomalas[alarmas_anomalas["EventName"] == 'Excesos de velocidad']
@@ -107,37 +54,45 @@ fig_map = px.scatter_mapbox(coordenadas_velocidad,
                         color="count",
                         size="count",
                         color_continuous_scale=px.colors.cyclical.Edge,
+                        title="Speeding Alarm Locations",
                         size_max=12,
                         zoom=4.5)
 
 
 
 ###################################################
-# Developing the prediction
+# Generating the speeding locations map predicted
 ###################################################
 
-#Xtest = pd.read_csv("data/X_test.csv")
-#filename = 'data/rf_model.pkl'
-#rf_v2 = joblib.load(open(filename, 'rb'))
-#Xtest_copy=Xtest.copy()
-#Xtest_copy=Xtest_copy.drop('Unnamed: 0',axis=1)
-#Xtest_copy = Xtest_copy.astype(np.float32)
-#y_pred = rf_v2.predict(Xtest_copy)
-#probs = rf_v2.predict_proba(Xtest_copy)
-#alarms=Xtest.loc[y_pred==1]
-
-#indices = alarms.iloc[:,0]
-#tabla_alarmas=alarmas_presentacion.loc[indices,:]
-
-fig_map_predictive = px.scatter_mapbox(alarms_selected,
+fig_map_predictive = px.scatter_mapbox(predicted_alarms,
                         lat="latitude",
                         lon="longitude",
-                        hover_name='month', hover_data=["month","EventName","idCompany", "businessName","transporter_name"],
+                        hover_name='month', hover_data=["month","EventName","idCompany", "idWorkOrder", "businessName","transporter_name"],
                         color="weekDay",
                         size="weekDay",
                         color_continuous_scale=px.colors.cyclical.Edge,
+                        title="Speeding Locations Predicted",
                         size_max=12,
                         zoom=4.5)
+
+
+################################################
+# Generating the random forest feature importances based on the prediction model results
+################################################
+names = []
+importance = []
+
+for key, value in feat_importance.items():
+  names.append(key)
+  importance.append(value)
+
+names = names[-10:]
+importance = importance[-10:]
+
+feature_importance = pd.DataFrame({'feature': names, 'importance': importance})
+
+fig_feature_imp = px.bar(feature_importance, x=feature_importance.importance, y=feature_importance.feature,
+                      labels={'x':'Importance', 'y': 'Feature'},color_discrete_sequence=px.colors.diverging.Portland,title="Random Forest Feature Importances (MDI)")
 
 
 # The style arguments for the sidebar. We use position:fixed and a fixed width
@@ -273,7 +228,7 @@ overview_content = html.Div(
 # Map speeding alarms graph
 graph_map = html.Div(
     [
-        html.Div("Map Alarms", className="card-header"),
+        html.Div(html.H5("Map Alarms"), className="card-header"),
         html.Div(dcc.Graph(id="priority-map", figure=fig_map), 
                  className="card-body"
         ),
@@ -285,7 +240,7 @@ graph_map = html.Div(
 # Monthly speeding alarms graph
 graph_month = html.Div(
     [
-        html.Div("Monthly Alarms", className="card-header"),
+        html.Div(html.H5("Monthly Alarms"), className="card-header"),
         html.Div(dcc.Graph(id="monthly-histogram"), 
                  className="card-body"
         ),
@@ -297,7 +252,7 @@ graph_month = html.Div(
 # Companies whose travels reported speeding alarms
 graph_business = html.Div(
     [
-        html.Div("Business Alarms", className="card-header"),
+        html.Div(html.H5("Business Alarms"), className="card-header"),
         html.Div(dcc.Graph(id="business-bar"), 
                  className="card-body"
         ),
@@ -309,7 +264,7 @@ graph_business = html.Div(
 # Type of cargo that were transported and reported speeding alarms during the trip
 graph_operation = html.Div(
     [
-        html.Div("Type Operation Alarms", className="card-header"),
+        html.Div(html.H5("Type Operation Alarms"), className="card-header"),
         html.Div(dcc.Graph(id="operation-bar"), 
                  className="card-body"
         ),
@@ -321,7 +276,7 @@ graph_operation = html.Div(
 # Top 30 of locations where were reported speeding alarms 
 graph_top30_excesos_velocidad = html.Div(
     [
-        html.Div("Top 30 speeding", className="card-header"),
+        html.Div(html.H5("Top 30 speeding"), className="card-header"),
         html.Div(dcc.Graph(id="top30-speeding-bar"), 
                  className="card-body"
         ),
@@ -330,21 +285,11 @@ graph_top30_excesos_velocidad = html.Div(
     style=card_width
 )
 
+
+# Mapping the locations predicted
 graph_map_predictive = html.Div(
     [
-        html.Div("Map Alarms", className="card-header"),
-        html.Div(dcc.Graph(id="predictive-map"), 
-                 className="card-body"
-        ),
-    ],
-    className="card",
-    style=card_width
-)
-
-
-graph_map_predictive = html.Div(
-    [
-        html.Div("Map Alarms", className="card-header"),
+        html.Div(html.H5("Map Alarms"), className="card-header"),
         html.Div(dcc.Graph(id="map-predictive", figure=fig_map_predictive), 
                  className="card-body"
         ),
@@ -352,6 +297,53 @@ graph_map_predictive = html.Div(
     className="card",
     style=card_width
 )
+
+# Random forest feature importances graph
+graph_feature_imp = html.Div(
+    [
+        html.Div(html.H5("Feature Importances (Top 10)"), className="card-header"),
+        html.Div(dcc.Graph(id="feature-importance", figure=fig_feature_imp), 
+                 className="card-body"
+        ),
+    ],
+    className="card",
+    style=card_width
+)
+
+# Table with information of the work orders predicted with the speeding alarms model
+graph_table_predictions = html.Div(
+    [
+        html.Div(html.H5("Predictions Table"), className="card-header"),
+        html.Div(
+            dash_table.DataTable(id="table",
+                                 columns=[{'name':i, 'id':i} for i in predicted_alarms.loc[:,['idWorkOrder', 'latitude', 'longitude', 'businessName', 'operation_type_description', 'transporter_name']]],
+                                 data=predicted_alarms.head(15).to_dict('records'),
+                                 style_as_list_view=True,
+                                 style_cell={'padding': '5px'},
+                                 style_header={
+                                    'backgroundColor': 'white',
+                                    'fontWeight': 'bold',
+                                    'font-family': 'Segoe UI Emoji',
+                                     'font-size': '12px'
+                                 },
+                                 style_data={ 'font-family': 'Segoe UI Emoji',
+                                                'font-size': '12px'
+                                            },
+                                 style_cell_conditional=[
+                                {
+                                    'font-family': 'Segoe UI Emoji',
+                                    'if': {'column_id': ['businessName', 'operation_type_description', 'transporter_name']},
+                                    'textAlign': 'left'
+                                }
+                                ]
+                                ),className="table table-responsive"
+        )
+        
+    ],
+    className="card",
+    style=card_width
+)
+
 
 # Descriptive of analytics content
 descriptive_content = html.Div(
@@ -412,8 +404,9 @@ predictive_content = html.Div(
         html.Hr(className="my-6"),
         dbc.Row(
             [
-                html.Div(
-                    html.P("The following map represents the result of the different speeding alarms predicted. The colors represent day of the week that the alarm could be reported based on the travel, drivers, transporters, vehicles among other information given by the company."), 
+                html.Div([
+                    html.P("The following map represents the result of the different speeding alarms predicted. The colors represent day of the week that the alarm could be reported based on the travel, drivers, transporters, vehicles among other information given by the company."),
+                    html.P("On the other hand, the feature importance plot shows the relative importance of each feature to the prediction of the Random Forest model. A higher importance number is linked with a more relevant feature for the model. We showcase the top 10 features of the best Random Forest. As observed, date-time feature like the alarm day, alarm week and hour are the most relevant feature of the model. Followed by the alarm location as measured by the longitude and latitude. Other features like the arrival distance, specific transportation companies and operation types are less relevant.")], 
                     className="col-md-12"
                 )
             ],
@@ -422,12 +415,20 @@ predictive_content = html.Div(
         html.Hr(className="my-2"),
         dbc.Row(
             [
-                html.Div(graph_map_predictive, className="col-md-12")
+                html.Div(graph_map_predictive, className="col-md-7"),
+                html.Div(graph_feature_imp, className="col-md-5")
+            ],
+            style=overview_main_content
+        ),
+        dbc.Row(
+            [
+                html.Div(graph_table_predictions, className="col-md-12")
             ],
             style=overview_main_content
         )
     ],
     className="container-fluid"
+
 )
 
 # Our team content
@@ -438,7 +439,7 @@ team_content = html.Div(
         dbc.Row(
             [
                 html.Div(
-                    html.P("We are a multidisciplinary who decided to tackle the business problem given by Control T. The combination of our skills made possible to understand and craft the problem, achieving a prediction model with 99% of accuracy."), 
+                    html.P("We are the multidisciplinary team, who decided to tackle the business problem given by Control T. The combination of our skills made possible to understand and craft the problem, achieving a prediction model with 99% of accuracy."), 
                     className="col-md-10"
                 ),
                 
@@ -461,9 +462,9 @@ team_content = html.Div(
                                                         html.Div(
                                                             [
                                                                 html.H5("Alejandra Torres"),
-                                                                html.P("Ingeniera Industrial - Universidad de los Andes")
+                                                                html.P("Ingeniera Industrial - Universidad de los Andes | Candidate to Master in International Financial Management - Lucerne University of Applied Sciences and Arts")
                                                             ], className="card-text"),
-                                                    ],className='card-body'
+                                                    ],className='card card-body card-block'
                                                 )
                                             ],className="card mb-4 shadow-sm"
                                         )
@@ -479,9 +480,9 @@ team_content = html.Div(
                                                         html.Div(
                                                             [
                                                                 html.H5("John Ortiz"),
-                                                                html.P("Ingeniero Quimico - Universidad de los Andes | MSc. Ingenieria quimica - Universidad de los Andes | MSc. Informática - Universidad de Northeastern")
+                                                                html.P("Ingeniero Quimico - Universidad de los Andes | MSc. Ingenieria Quimica - Universidad de los Andes | MSc. Informática - Universidad de Northeastern")
                                                             ], className="card-text"),
-                                                    ],className='card-body'
+                                                    ],className='card card-body card-block'
                                                 )
                                             ],className="card mb-4 shadow-sm"
                                         )
@@ -497,56 +498,68 @@ team_content = html.Div(
                                                         html.Div(
                                                             [
                                                                 html.H5("Liliana Navarro"),
-                                                                html.P("Ingeniera de Sistemas - Universidad Distrital FJC | Especialista en Construcción de Software - Universidad de los Andes | Advanced Master in Innovation and Entrepreneurship - Politecnico di Milano & ULB Solvay Brussels School")
+                                                                html.P("Ingeniera de Sistemas - Universidad Distrital FJC | Esp. Construcción de Software - Universidad de los Andes | Advanced Master in Innovation and Entrepreneurship - Politecnico di Milano & ULB Solvay Brussels School")
                                                             ], className="card-text"),
-                                                    ],className='card-body'
+                                                    ],className='card card-body card-block'
                                                 )
                                             ],className="card mb-4 shadow-sm"
                                         )
                                     ],className="col-md-4"
                                 ),
-								html.Div(
+                                html.Div(
                                     [
                                         html.Div( 
                                             [
-                                                html.Div(className="bd-placeholder-img card-img-top image-member"),
+                                                html.Div(className="bd-placeholder-img card-img-top image-member4"),
                                                 html.Div( 
                                                     [
-                                                        html.Div("Comming soon", className="card-text"),
-                                                    ],className='card-body'
+                                                        html.Div(
+                                                            [
+                                                                html.H5("Jorge mendoza"),
+                                                                html.P("Estadístico - Universidad Nacional de Colombia | MSc. Estadística - Universidad Nacional de Colombia")
+                                                            ], className="card-text"),
+                                                    ],className='card card-body card-block'
                                                 )
                                             ],className="card mb-4 shadow-sm"
                                         )
                                     ],className="col-md-4"
                                 ),
-								html.Div(
+                                html.Div(
                                     [
                                         html.Div( 
                                             [
-                                                html.Div(className="bd-placeholder-img card-img-top image-member"),
+                                                html.Div(className="bd-placeholder-img card-img-top image-member5"),
                                                 html.Div( 
                                                     [
-                                                        html.Div("Comming soon", className="card-text"),
-                                                    ],className='card-body'
+                                                        html.Div(
+                                                            [
+                                                                html.H5("Nataly Orjuela"),
+                                                                html.P("Economista - Universidad de la Salle")
+                                                            ], className="card-text"),
+                                                    ],className='card card-body card-block'
                                                 )
                                             ],className="card mb-4 shadow-sm"
                                         )
                                     ],className="col-md-4"
                                 ),
-								html.Div(
+                                html.Div(
                                     [
                                         html.Div( 
                                             [
-                                                html.Div(className="bd-placeholder-img card-img-top image-member"),
+                                                html.Div(className="bd-placeholder-img card-img-top image-member6"),
                                                 html.Div( 
                                                     [
-                                                        html.Div("Comming soon", className="card-text"),
-                                                    ],className='card-body'
+                                                        html.Div(
+                                                            [
+                                                                html.H5("Gabriel Triana"),
+                                                                html.P("Matemático - Universidad Nacional de Colombia | MSc. Matemática Aplicada - Universidad Nacional de Colombia | Doctor en Ciencias Matemáticas - Universidad Nacional de Colombia")
+                                                            ], className="card-text"),
+                                                    ],className='card card-body card-block'
                                                 )
                                             ],className="card mb-4 shadow-sm"
                                         )
                                     ],className="col-md-4"
-                                )
+                                ),
                             ], className='row'
                         ), className='container'
                     ),className="album py-5 bg-light full-width"
@@ -675,6 +688,23 @@ def update_fig_operations (start_date,end_date):
 
     return fig_operation
 
+
+@app.callback(
+    Output("table", "data"),
+    [
+        Input("map-predictive", "clickData")
+    ],
+)
+def update_table (clickData):
+    print(clickData)
+    #alarmID = clickData['points'][0]['customdata'][3]
+    longitud = clickData['points'][0]['lon']
+    latitud = clickData['points'][0]['lat']
+    print(longitud)
+    print(latitud)
+    #alarm = alarms_selected[alarms_selected['idWorkOrder'==alarmID]]
+    alarm = alarms_selected[(alarms_selected['latitude']==latitud) & (alarms_selected['longitude']==longitud)]
+    return alarm.to_dict('records')
 
 
 if __name__ == '__main__':

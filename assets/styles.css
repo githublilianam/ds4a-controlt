@@ -5,11 +5,14 @@
 .image-member1,
 .image-member2,
 .image-member3,
+.image-member4,
+.image-member5,
+.image-member6,
 .image-transport {
     height: 225px;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: #777777;
+    background-color: #EEEEEE;
     background-size: contain;
 }
 
@@ -22,6 +25,15 @@
 .image-member3 {
     background-image: url(images/perfil_liliana.jpg);
 }
+.image-member4 {
+    background-image: url(images/perfil_jorge.jpg);
+}
+.image-member5 {
+    background-image: url(images/perfil_nataly.png);
+}
+.image-member6 {
+    background-image: url(images/perfil_juan.JPG);
+}
 .image-transport {
     height: 690px !important;
     background-image: url(images/Transport1.jpg);
@@ -30,4 +42,11 @@
 }
 .full-width {
     width: 100%;
+}
+.cell-table>tbody>tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+.card {
+    min-height: 215px;
+    line-height: 1.3;
 }
